@@ -18,7 +18,11 @@ import {
     updateDoc,
     arrayUnion,
     arrayRemove,
+<<<<<<< HEAD
     deleteDoc // For group deletion
+=======
+    deleteDoc // Added for group deletion
+>>>>>>> d3fe5701df4cee03c42abf4d6d666235fd2e54dc
 } from 'firebase/firestore';
 
 // =================================================================
@@ -60,8 +64,13 @@ const App = () => {
     const [loading, setLoading] = useState(true);
     const [isAuthReady, setIsAuthReady] = useState(false);
     const [newGroupName, setNewGroupName] = useState('');
+<<<<<<< HEAD
     const [newGroupDescription, setNewGroupDescription] = useState(''); 
     const [newGroupPictureUrl, setNewGroupPictureUrl] = useState(''); 
+=======
+    const [newGroupDescription, setNewGroupDescription] = useState(''); // New State
+    const [newGroupPictureUrl, setNewGroupPictureUrl] = useState(''); // New State
+>>>>>>> d3fe5701df4cee03c42abf4d6d666235fd2e54dc
     const [feedbackMessage, setFeedbackMessage] = useState({ text: '', type: '' }); // type: 'success' or 'error'
 
     // 1. AUTHENTICATION LISTENER
@@ -154,6 +163,7 @@ const App = () => {
             const groupsCollectionRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/groups`);
             await addDoc(groupsCollectionRef, newGroupData);
 
+<<<<<<< HEAD
             // --- JUMPING CURSOR FIX: Only reset state AFTER successful DB operation ---
             setNewGroupName('');
             setNewGroupDescription('');
@@ -161,6 +171,15 @@ const App = () => {
             // --- END FIX ---
             
             setFeedbackMessage({ text: `Group "${groupName}" created successfully!`, type: 'success' }); 
+=======
+            // Reset all creation fields on success
+            setNewGroupName('');
+            setNewGroupDescription('');
+            setNewGroupPictureUrl('');
+
+            // Note: Setting feedback here shouldn't cause the jump if the component state itself doesn't trigger scroll
+            setFeedbackMessage({ text: `Group "${newGroupName}" created successfully!`, type: 'success' }); 
+>>>>>>> d3fe5701df4cee03c42abf4d6d666235fd2e54dc
 
         } catch (error) {
             console.error("Error creating group:", error);
@@ -499,6 +518,12 @@ export default App;
 // =================================================================
 // MANDATORY REACT INITIALIZATION FOR SINGLE-FILE JSX
 // =================================================================
+<<<<<<< HEAD
+=======
+// These script tags must be placed outside the main component export block 
+// to correctly load React and render the component into the HTML document body.
+
+>>>>>>> d3fe5701df4cee03c42abf4d6d666235fd2e54dc
 /* eslint-disable no-undef */ 
 const rootElement = document.getElementById('root');
 const root = ReactDOM.createRoot(rootElement);
@@ -537,3 +562,7 @@ document.body.innerHTML = `
     </body>
     </html>
 `;
+<<<<<<< HEAD
+=======
+Feature: Improved desktop layout and added group deletion logic
+>>>>>>> d3fe5701df4cee03c42abf4d6d666235fd2e54dc
