@@ -500,15 +500,10 @@ export default App;
 
 // =================================================================
 // MANDATORY REACT INITIALIZATION FOR SINGLE-FILE JSX
+// CRITICAL FIX: Ensure initialization runs AFTER the DOM is ready.
 // =================================================================
-/* eslint-disable no-undef */ 
-const rootElement = document.getElementById('root');
-const root = ReactDOM.createRoot(rootElement);
-root.render(React.createElement(App));
-/* eslint-enable no-undef */
 
 // Add the necessary library imports and root element to the generated file structure
-// IMPORTANT: We move the script tags into the <head> for proper loading order and ensure the font is linked.
 document.body.innerHTML = `
     <!DOCTYPE html>
     <html lang="en">
@@ -530,19 +525,21 @@ document.body.innerHTML = `
     </head>
     <body>
         <div id="root"></div>
-        <script type="module">
-            // This script block remains for the execution environment to render the App component
-            import App from './src/App.jsx'; 
-            
-            // Get the root element
-            const rootElement = document.getElementById('root');
-            if (rootElement) {
-                // Initialize React 18 root and render the App component
-                const root = ReactDOM.createRoot(rootElement);
-                root.render(React.createElement(App));
-            } else {
-                console.error("Root element #root not found in the document.");
-            }
+        <script>
+            // This script runs AFTER the #root div is guaranteed to be in the DOM.
+            // We use DOMContentLoaded to ensure the browser has fully built the HTML structure.
+            document.addEventListener('DOMContentLoaded', function() {
+                const rootElement = document.getElementById('root');
+                // The App component is globally available since it's defined at the top of the file
+                if (rootElement && typeof App !== 'undefined') {
+                    const root = ReactDOM.createRoot(rootElement);
+                    root.render(React.createElement(App));
+                } else if (!rootElement) {
+                    console.error("Root element #root not found in the document.");
+                } else {
+                    console.error("App component is not defined globally. Check file structure.");
+                }
+            });
         </script>
     </body>
     </html>
