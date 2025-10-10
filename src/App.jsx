@@ -6,7 +6,6 @@ import {
     GoogleAuthProvider, 
     signOut, 
     onAuthStateChanged,
-    // signInAnonymously is not needed for this public sign-in flow
 } from 'firebase/auth';
 import { 
     getFirestore, 
@@ -18,11 +17,7 @@ import {
     updateDoc,
     arrayUnion,
     arrayRemove,
-<<<<<<< HEAD
     deleteDoc // For group deletion
-=======
-    deleteDoc // Added for group deletion
->>>>>>> d3fe5701df4cee03c42abf4d6d666235fd2e54dc
 } from 'firebase/firestore';
 
 // =================================================================
@@ -64,13 +59,8 @@ const App = () => {
     const [loading, setLoading] = useState(true);
     const [isAuthReady, setIsAuthReady] = useState(false);
     const [newGroupName, setNewGroupName] = useState('');
-<<<<<<< HEAD
     const [newGroupDescription, setNewGroupDescription] = useState(''); 
     const [newGroupPictureUrl, setNewGroupPictureUrl] = useState(''); 
-=======
-    const [newGroupDescription, setNewGroupDescription] = useState(''); // New State
-    const [newGroupPictureUrl, setNewGroupPictureUrl] = useState(''); // New State
->>>>>>> d3fe5701df4cee03c42abf4d6d666235fd2e54dc
     const [feedbackMessage, setFeedbackMessage] = useState({ text: '', type: '' }); // type: 'success' or 'error'
 
     // 1. AUTHENTICATION LISTENER
@@ -152,6 +142,7 @@ const App = () => {
             const newGroupData = {
                 name: groupName,
                 description: newGroupDescription.trim() || 'No description provided.',
+                // Ensure default image is robust
                 pictureUrl: newGroupPictureUrl.trim() || 'https://placehold.co/100x100/A5B4FC/3730A3?text=STRIDE', 
                 creatorId: user.uid,
                 creatorName: user.displayName || 'Anonymous User',
@@ -163,7 +154,6 @@ const App = () => {
             const groupsCollectionRef = collection(db, `artifacts/${firebaseConfig.appId}/public/data/groups`);
             await addDoc(groupsCollectionRef, newGroupData);
 
-<<<<<<< HEAD
             // --- JUMPING CURSOR FIX: Only reset state AFTER successful DB operation ---
             setNewGroupName('');
             setNewGroupDescription('');
@@ -171,15 +161,6 @@ const App = () => {
             // --- END FIX ---
             
             setFeedbackMessage({ text: `Group "${groupName}" created successfully!`, type: 'success' }); 
-=======
-            // Reset all creation fields on success
-            setNewGroupName('');
-            setNewGroupDescription('');
-            setNewGroupPictureUrl('');
-
-            // Note: Setting feedback here shouldn't cause the jump if the component state itself doesn't trigger scroll
-            setFeedbackMessage({ text: `Group "${newGroupName}" created successfully!`, type: 'success' }); 
->>>>>>> d3fe5701df4cee03c42abf4d6d666235fd2e54dc
 
         } catch (error) {
             console.error("Error creating group:", error);
@@ -193,7 +174,8 @@ const App = () => {
             return;
         }
         
-        // Simple confirmation via feedback message
+        // IMPORTANT: Use custom modal UI instead of window.confirm in real apps
+        // For simplicity in this single file, we will continue using window.confirm (but in the future, please replace this with a custom component)
         if (!window.confirm(`Are you sure you want to permanently delete the group "${selectedGroup.name}"?`)) {
             return;
         }
@@ -262,6 +244,7 @@ const App = () => {
             <nav className="flex items-center space-x-4">
                 {user ? (
                     <>
+                        {/* Display User Name on Desktop */}
                         <span className="text-sm hidden md:inline font-medium">Hi, {user.displayName || 'Runner'}</span>
                         <button 
                             onClick={handleSignOut} 
@@ -306,12 +289,12 @@ const App = () => {
             : 'bg-indigo-500 hover:bg-indigo-600';
         
         return (
-            <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100 flex flex-col h-full">
+            <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100 flex flex-col h-full transform hover:scale-[1.02] transition duration-200">
                 <div className="flex items-center mb-3">
                     <img 
                         src={group.pictureUrl || 'https://placehold.co/100x100/A5B4FC/3730A3?text=STRIDE'} 
                         alt={`${group.name} picture`} 
-                        className="w-12 h-12 rounded-full object-cover mr-4"
+                        className="w-12 h-12 rounded-full object-cover mr-4 shadow-inner"
                         onError={(e) => e.target.src = 'https://placehold.co/100x100/A5B4FC/3730A3?text=STRIDE'}
                     />
                     <div>
@@ -350,7 +333,7 @@ const App = () => {
     const GroupListView = () => (
         <div className="p-4 sm:p-8 max-w-6xl mx-auto">
             <div className="bg-white p-6 md:p-8 rounded-xl shadow-2xl border border-indigo-100 mb-8">
-                <h2 className="text-3xl font-extrabold text-gray-900 mb-2">Find Your Tribe</h2>
+                <h2 className="text-4xl font-extrabold text-gray-900 mb-2">Find Your Tribe</h2>
                 <p className="text-gray-600 mb-6">Discover local running groups, events, and connect with fellow runners in your area.</p>
 
                 {user && (
@@ -361,25 +344,25 @@ const App = () => {
                             value={newGroupName}
                             onChange={(e) => setNewGroupName(e.target.value)}
                             placeholder="1. Group Name (e.g., Morning Trail Crew)"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
                         />
                         <textarea 
                             value={newGroupDescription}
                             onChange={(e) => setNewGroupDescription(e.target.value)}
                             placeholder="2. Group Description (e.g., We meet every Saturday at 6 AM at Central Park.)"
                             rows="2"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
                         />
                         <input 
                             type="url"
                             value={newGroupPictureUrl}
                             onChange={(e) => setNewGroupPictureUrl(e.target.value)}
                             placeholder="3. Group Picture URL (Optional, must be a direct image link)"
-                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+                            className="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
                         />
                         <button 
                             onClick={handleCreateGroup}
-                            className="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition duration-150 shadow-lg hover:shadow-xl"
+                            className="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-bold transition duration-150 shadow-lg hover:shadow-xl transform hover:translate-y-[-1px]"
                         >
                             Create Group
                         </button>
@@ -387,7 +370,7 @@ const App = () => {
                 )}
 
                 {!user && (
-                    <div className="p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-700 rounded-lg">
+                    <div className="p-4 bg-yellow-50 border-l-4 border-yellow-400 text-yellow-700 rounded-lg shadow-inner">
                         <p className="font-medium">Sign in to create or join groups!</p>
                     </div>
                 )}
@@ -468,7 +451,7 @@ const App = () => {
                         {user && (
                             <button 
                                  onClick={() => handleJoinLeaveGroup(selectedGroup.id, isMember)}
-                                className={`text-white px-8 py-3 rounded-full font-bold transition duration-150 shadow-lg ${isMember ? 'bg-red-500 hover:bg-red-600' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+                                className={`text-white px-8 py-3 rounded-full font-bold transition duration-150 shadow-lg ${isMember ? 'bg-red-500 hover:bg-red-600 transform hover:scale-[1.02]' : 'bg-indigo-600 hover:bg-indigo-700 transform hover:scale-[1.02]'}`}
                             >
                                  {isMember ? 'Leave This Group' : 'Join This Group'}
                             </button>
@@ -478,7 +461,7 @@ const App = () => {
                         {isCreator && (
                             <button 
                                  onClick={() => handleDeleteGroup(selectedGroup.id)}
-                                className="bg-gray-400 hover:bg-gray-500 text-white px-8 py-3 rounded-full font-bold transition duration-150 shadow-lg"
+                                className="bg-gray-400 hover:bg-gray-500 text-white px-8 py-3 rounded-full font-bold transition duration-150 shadow-lg transform hover:scale-[1.02]"
                             >
                                 Delete Group (Creator)
                             </button>
@@ -518,12 +501,6 @@ export default App;
 // =================================================================
 // MANDATORY REACT INITIALIZATION FOR SINGLE-FILE JSX
 // =================================================================
-<<<<<<< HEAD
-=======
-// These script tags must be placed outside the main component export block 
-// to correctly load React and render the component into the HTML document body.
-
->>>>>>> d3fe5701df4cee03c42abf4d6d666235fd2e54dc
 /* eslint-disable no-undef */ 
 const rootElement = document.getElementById('root');
 const root = ReactDOM.createRoot(rootElement);
@@ -531,6 +508,7 @@ root.render(React.createElement(App));
 /* eslint-enable no-undef */
 
 // Add the necessary library imports and root element to the generated file structure
+// IMPORTANT: We move the script tags into the <head> for proper loading order and ensure the font is linked.
 document.body.innerHTML = `
     <!DOCTYPE html>
     <html lang="en">
@@ -538,8 +516,14 @@ document.body.innerHTML = `
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>STRIDEHUB Community App</title>
+        <!-- Inter Font Link -->
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
         <!-- Tailwind CSS CDN -->
         <script src="https://cdn.tailwindcss.com"></script>
+        <!-- Global Style Override for Inter Font -->
+        <style>
+            body { font-family: 'Inter', sans-serif; }
+        </style>
         <!-- React and ReactDOM CDNs -->
         <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
         <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
@@ -547,7 +531,8 @@ document.body.innerHTML = `
     <body>
         <div id="root"></div>
         <script type="module">
-            import App from './src/App.jsx'; // Import the main component
+            // This script block remains for the execution environment to render the App component
+            import App from './src/App.jsx'; 
             
             // Get the root element
             const rootElement = document.getElementById('root');
@@ -562,7 +547,3 @@ document.body.innerHTML = `
     </body>
     </html>
 `;
-<<<<<<< HEAD
-=======
-Feature: Improved desktop layout and added group deletion logic
->>>>>>> d3fe5701df4cee03c42abf4d6d666235fd2e54dc
